@@ -1445,7 +1445,7 @@ class RandomContrast(base_layer.BaseRandomLayer):
 
 
 @keras_export('keras.layers.RandomBrightness', v1=[])
-class RandomBrightness(base_layer.BaseRandomLayer):
+class RandomBrightness(BaseImageAugmentationLayer):
   """A preprocessing layer which randomly adjusts brightness during training.
 
   This layer will randomly increase/reduce the brightness for the input RGB
@@ -1515,6 +1515,9 @@ class RandomBrightness(base_layer.BaseRandomLayer):
     self._set_value_range(value_range)
     self._seed = seed
 
+  def augment_image(self, image, transformation=None):
+    return self._brightness_adjust(image)
+
   def _set_value_range(self, value_range):
     if not isinstance(value_range, (tuple, list)):
       raise ValueError(
@@ -1541,12 +1544,6 @@ class RandomBrightness(base_layer.BaseRandomLayer):
   def _check_factor_range(self, input_number):
     if input_number > 1.0 or input_number < -1.0:
       raise ValueError(self._FACTOR_VALIDATION_ERROR + f'Got {input_number}')
-
-  def call(self, inputs, training=True):
-    if training:
-      return self._brightness_adjust(inputs)
-    else:
-      return inputs
 
   def _brightness_adjust(self, images):
     images = utils.ensure_tensor(images, self.compute_dtype)
